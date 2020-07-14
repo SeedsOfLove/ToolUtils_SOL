@@ -1,4 +1,4 @@
-package com.bluewater.lib;
+package com.bluewater.toolutilslib;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

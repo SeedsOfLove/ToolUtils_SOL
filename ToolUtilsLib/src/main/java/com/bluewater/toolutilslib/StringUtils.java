@@ -1,4 +1,4 @@
-package com.bluewater.lib;
+package com.bluewater.toolutilslib;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
