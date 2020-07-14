@@ -1,0 +1,3 @@
+include ':ToolUtilsLib'
+include ':app'
+rootProject.name = "ToolUtils_SOL"
