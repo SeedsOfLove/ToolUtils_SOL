@@ -92,30 +92,38 @@ public class AppUtils
     }
 
     /**
-     * 获取App更新文件（apk）本地下载路径
-     * @param apkName   apk名称
+     * 获取App文件本地下载路径
+     * 公共外部存储路径--系统Download目录下--本App包名文件夹--存放所有该App的下载文件
+     * 一般为“/storage/emulated/0/Download/包名/”
+     * @param packageName   app包名
      * @return
      */
-    public static String getAPKLocalDir(String apkName)
+    public static String getAppDownloadDir(String packageName)
     {
         File sdDir = null;
 
         boolean sdCardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);// 判断sd卡是否存在
         if (sdCardExist)
         {
-            sdDir = Environment.getExternalStorageDirectory();       // 获取根目录
+            sdDir = Environment.getExternalStorageDirectory();       // 获取公共外部存储根目录
         }
-
-//        String apkName = BaseApplication.getContext().getResources().getString(R.string.app_name);
 
         String dirpath;
         if (sdDir != null)
         {
-            dirpath = sdDir.toString() + "/AppName/" + apkName + ".apk";
+            //File.separator这个代表系统目录中的间隔符，
+            //说白了就是斜线，不过有时候需要双线，有时候是单线，
+            //你用这个静态变量就解决兼容问题了。
+            dirpath = sdDir.toString()
+                        + File.separator + Environment.DIRECTORY_DOWNLOADS
+                        + File.separator + packageName
+                        + File.separator;
         }
         else
         {
-            dirpath = "/AppName/" + apkName + ".apk";
+            dirpath = File.separator + Environment.DIRECTORY_DOWNLOADS
+                        + File.separator + packageName
+                        + File.separator;
         }
 
         return dirpath;
@@ -221,7 +229,7 @@ public class AppUtils
 
 
     /*
-        举例：
+         防止按钮重复点击     举例：
         btn.setOnClickListener(new View.OnClickListener()
             {
                 @Override
