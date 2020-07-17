@@ -94,12 +94,14 @@ public class AppUtils
     /**
      * 获取App文件本地下载路径
      * 公共外部存储路径--系统Download目录下--本App包名文件夹--存放所有该App的下载文件
-     * 一般为“/storage/emulated/0/Download/包名/”
-     * @param packageName   app包名
+     * 一般为“/storage/emulated/0/Download/app包名/”
+     * @param context
      * @return
      */
-    public static String getAppDownloadDir(String packageName)
+    public static String getAppDownloadDir(Context context)
     {
+        String packageName = getPackageName(context);
+
         File sdDir = null;
 
         boolean sdCardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);// 判断sd卡是否存在
