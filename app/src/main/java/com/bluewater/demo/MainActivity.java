@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.bluewater.toolutilslib.AppUtils;
+import com.bluewater.toolutilslib.Base64Utils;
+import com.bluewater.toolutilslib.MobileInfoUtils;
 import com.bluewater.toolutilslib.NetworkUtils;
 
 public class MainActivity extends AppCompatActivity
@@ -18,6 +20,10 @@ public class MainActivity extends AppCompatActivity
 
     private TextView mText1;
     private TextView mText2;
+    private TextView mText3;
+    private TextView mText4;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,6 +36,8 @@ public class MainActivity extends AppCompatActivity
 
         mText1 = findViewById(R.id.text1);
         mText2 = findViewById(R.id.text2);
+        mText3 = findViewById(R.id.text3);
+        mText4 = findViewById(R.id.text4);
 
         //---------------AppUtils
         String dir = AppUtils.getAppDownloadDir(this);
@@ -75,6 +83,31 @@ public class MainActivity extends AppCompatActivity
                 + "IP地址：" + ip + "\n"
                 + "WiFi IP地址：" + wifiIp + "\n"
         );
+
+        //------------------MobileInfoUtils
+        String brand = MobileInfoUtils.getDeviceBrand();
+        String phoneModel = MobileInfoUtils.getPhoneModel();
+        String androidSystemVersion = MobileInfoUtils.getAndroidSystemVersion();
+        String systemLanguage = MobileInfoUtils.getSystemLanguage();
+
+        mText3.setText("手机厂商：" + brand + "\n"
+                        + "手机型号：" + phoneModel + "\n"
+                        + "系统版本号：" + androidSystemVersion + "\n"
+                        + "当前手机系统语言：" + systemLanguage + "\n"
+        );
+
+        //------------------Base64Utils
+        String password = "i love jing+-*/=！@#￥%……&*（）｛｝【】【】[]";
+
+        String pwEnc = Base64Utils.encryptBASE64(password);
+        String pwDec = Base64Utils.decryptBASE64(pwEnc);
+
+        mText4.setText("原密码：" + password + "\n"
+                + "Base64加密：" + pwEnc + "\n"
+                + "Base64解密：" + pwDec + "\n"
+        );
+
+
     }
 
 

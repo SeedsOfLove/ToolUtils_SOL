@@ -35,6 +35,20 @@
                 android:layout_marginTop="16dp"
                 android:text="TextView" />
 
+            <TextView
+                android:id="@+id/text3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="TextView" />
+
+            <TextView
+                android:id="@+id/text4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="TextView" />
+
             <Button
                 android:id="@+id/btn1"
                 android:layout_width="wrap_content"
