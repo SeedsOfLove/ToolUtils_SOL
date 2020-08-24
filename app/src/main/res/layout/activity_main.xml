@@ -60,6 +60,14 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <EditText
+                android:id="@+id/et_sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="SharedPreferencesUtils保存本地"
+                android:inputType="textPersonName" />
+
             <Button
                 android:id="@+id/btn2"
                 android:layout_width="wrap_content"
@@ -67,7 +75,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:onClick="onClick2"
-                android:text="BUTTON" />
+                android:text="数据存储" />
 
         </LinearLayout>
     </ScrollView>

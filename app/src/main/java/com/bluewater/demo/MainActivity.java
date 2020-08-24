@@ -6,12 +6,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bluewater.toolutilslib.AppUtils;
 import com.bluewater.toolutilslib.Base64Utils;
 import com.bluewater.toolutilslib.MobileInfoUtils;
 import com.bluewater.toolutilslib.NetworkUtils;
+import com.bluewater.toolutilslib.SharedPreferencesUtils;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -22,6 +25,9 @@ public class MainActivity extends AppCompatActivity
     private TextView mText2;
     private TextView mText3;
     private TextView mText4;
+    private EditText mEtSp;
+
+
 
 
 
@@ -38,6 +44,7 @@ public class MainActivity extends AppCompatActivity
         mText2 = findViewById(R.id.text2);
         mText3 = findViewById(R.id.text3);
         mText4 = findViewById(R.id.text4);
+        mEtSp = findViewById(R.id.et_sp);
 
         //---------------AppUtils
         String dir = AppUtils.getAppDownloadDir(this);
@@ -107,7 +114,9 @@ public class MainActivity extends AppCompatActivity
                 + "Base64解密：" + pwDec + "\n"
         );
 
-
+        //------------------SharedPreferencesUtils
+        SharedPreferencesUtils spu = new SharedPreferencesUtils(mContext, "file_shared_preferences_test");
+        mEtSp.setText(spu.getString("value"));
     }
 
 
@@ -124,9 +133,41 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
+    //数据存储
     public void onClick2(View view)
     {
+        //获取SharedPreferences对象，使用自定义类的方法来获取对象
+        SharedPreferencesUtils spu = new SharedPreferencesUtils(mContext, "file_shared_preferences_test");
+
+        spu.putValues(new SharedPreferencesUtils.ContentValue("value", mEtSp.getText().toString()));    //插入值
+
+        Toast.makeText(mContext, spu.getString("value"), Toast.LENGTH_SHORT).show();    //获取值
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
