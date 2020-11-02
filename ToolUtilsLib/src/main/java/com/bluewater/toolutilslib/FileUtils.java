@@ -1,18 +1,187 @@
 package com.bluewater.toolutilslib;
 
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.os.StatFs;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 文件操作工具类
  */
 public class FileUtils
 {
+    /**
+     * 获取文件夹目录下的所有文件
+     * @param context       上下文
+     * @param folderPath    文件夹路径
+     * @return
+     */
+    public static File[] getFiles(Context context, String folderPath)
+    {
+        File file = new File(folderPath);
+        File[] files = file.listFiles();
+
+        if (files == null)
+        {
+            Toast.makeText(context, folderPath + "为空目录", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        else
+        {
+            return files;
+        }
+    }
+
+    /**
+     * 获取文件夹目录下的所有文件的路径
+     * @param context           上下文
+     * @param folderPath        文件夹路径
+     * @return
+     */
+    public static List<String> getFilesPath(Context context, String folderPath)
+    {
+        File[] files = getFiles(context, folderPath);
+
+        if (files == null)
+        {
+            Toast.makeText(context, folderPath + "为空目录", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        else
+        {
+            List<String> list = new ArrayList<>();
+
+            for (int i = 0; i < files.length; i++)
+            {
+                list.add(files[i].getAbsolutePath());
+            }
+
+            return list;
+        }
+    }
+    /**
+     * 打开文件
+     * @param context       上下文
+     * @param filePath      文件路径
+     * @param strMIMEType   MIME类型  如".txt"对应"text/plain"，".jpg"对应"image/jpeg"
+     */
+    public static void openfile(Context context, String filePath, String strMIMEType)
+    {
+        File file = new File(filePath);
+        if (file.exists())
+        {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)     //Android7.0以上，文件限制访问
+            {
+                Uri uri = FileProvider.getUriForFile(context, "com.example.ztbq.fileprovider", file);
+
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); //添加这一句表示对目标应用临时授权该Uri所代表的文件
+                intent.setDataAndType(uri, strMIMEType);
+            }
+            else
+            {
+                Uri uri = Uri.fromFile(file);
+                intent.setDataAndType(uri, strMIMEType);
+            }
+            context.startActivity(intent);
+        }
+        else
+        {
+            Toast.makeText(context, "未找到此文件", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 转换路径，返回文件真实路径(适用于Android4.4版本(API_19)及以上版本)
+     * 解决android4.4以上机型文件管理器选择文件后返回路径无法正常读取文件的问题
+     */
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public static String getPath(final Context context, final Uri uri)
+    {
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri))
+        {
+            if (isExternalStorageDocument(uri))                                             // ExternalStorageProvider
+            {
+                final String docId = DocumentsContract.getDocumentId(uri);
+//                Log.i(TAG,"isExternalStorageDocument***"+uri.toString());
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type))
+                {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+            }
+            else if (isDownloadsDocument(uri))                                              // DownloadsProvider
+            {
+//                Log.i(TAG,"isDownloadsDocument***"+uri.toString());
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            else if (isMediaDocument(uri))                                                  // MediaProvider
+            {
+//                Log.i(TAG,"isMediaDocument***"+uri.toString());
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type))
+                {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                }
+                else if ("video".equals(type))
+                {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                }
+                else if ("audio".equals(type))
+                {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{split[1]};
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        else if ("content".equalsIgnoreCase(uri.getScheme()))                               // MediaStore (and general)
+        {
+//            Log.i(TAG,"content***"+uri.toString());
+            return getDataColumn(context, uri, null, null);
+        }
+        else if ("file".equalsIgnoreCase(uri.getScheme()))                                  // File
+        {
+//            Log.i(TAG,"file***"+uri.toString());
+            return uri.getPath();
+        }
+        return null;
+    }
+
     /**
      * 判断文件是否已经存在
      *
@@ -308,5 +477,53 @@ public class FileUtils
         {
             return 0;
         }
+    }
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs)
+    {
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {column};
+
+        try
+        {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst())
+            {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally
+        {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+    public static boolean isExternalStorageDocument(Uri uri)
+    {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    public static boolean isDownloadsDocument(Uri uri)
+    {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    public static boolean isMediaDocument(Uri uri)
+    {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }
