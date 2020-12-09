@@ -15,6 +15,7 @@ import com.bluewater.toolutilslib.Base64Utils;
 import com.bluewater.toolutilslib.MobileInfoUtils;
 import com.bluewater.toolutilslib.NetworkUtils;
 import com.bluewater.toolutilslib.SharedPreferencesUtils;
+import com.bluewater.toolutilslib.StringUtils;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity
     private TextView mText3;
     private TextView mText4;
     private EditText mEtSp;
-
+    private EditText mEtPhoneNumber;
 
 
 
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity
         mText3 = findViewById(R.id.text3);
         mText4 = findViewById(R.id.text4);
         mEtSp = findViewById(R.id.et_sp);
+        mEtPhoneNumber = findViewById(R.id.et_phone_number);
 
         //---------------AppUtils
         String dir = AppUtils.getAppDownloadDir(this);
@@ -145,29 +147,17 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    //手机号验证
+    public void onClick3(View view)
+    {
+        String phoneNumber = mEtPhoneNumber.getText().toString().trim();
+        if (StringUtils.isValidPhoneNumber(phoneNumber))
+        {
+            Toast.makeText(mContext, "手机号码格式正确", Toast.LENGTH_SHORT).show();    //获取值
+        }
+        else
+        {
+            Toast.makeText(mContext, "手机号码格式错误", Toast.LENGTH_SHORT).show();    //获取值
+        }
+    }
 }

@@ -7,6 +7,9 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * 字符串处理类
  */
@@ -109,6 +112,32 @@ public class StringUtils
 
         String reg = "^[0-9]+(.[0-9]+)?$";
         return tmp.matches(reg);
+    }
+
+    /**
+     * 验证手机号码格式是否合法
+     * @param number
+     * @return
+     */
+    public static boolean isValidPhoneNumber(String number)
+    {
+        Pattern pat = Pattern.compile("^[1][34578][0-9]{9}$");
+        Matcher mat = pat.matcher(number);
+        return mat.find();
+    }
+
+    /**
+     * 验证邮箱是否合法
+     * @param email
+     * @return
+     */
+    public static boolean isValidEmail(String email)
+    {
+        if ((email != null) && (!email.isEmpty()))
+        {
+            return Pattern.matches("^(\\w+([-.][A-Za-z0-9]+)*){3,18}@\\w+([-.][A-Za-z0-9]+)*\\.\\w+([-.][A-Za-z0-9]+)*$", email);
+        }
+        return false;
     }
 
 
