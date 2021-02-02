@@ -4,14 +4,20 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Environment;
 import android.telephony.TelephonyManager;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
@@ -274,7 +280,47 @@ public class AppUtils
         return tm != null && tm.getSimState() == TelephonyManager.SIM_STATE_READY;
     }
 
+    /**
+     * 关键字高亮显示
+     *
+     * 调用 View.setText(SpannableString string)
+     *
+     * @param context 上下文
+     * @param text    需要显示的文字
+     * @param target  需要高亮的关键字
+     * @param colorID 高亮颜色
+     * @param start   头部增加高亮文字个数
+     * @param end     尾部增加高亮文字个数
+     * @return 处理完后的结果
+     */
+    public static SpannableString highlight(Context context, String text, String target,
+                                            int colorID, int start, int end)
+    {
+        SpannableString spannableString = new SpannableString(text);
+        Pattern pattern = Pattern.compile(target);
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find())
+        {
+            ForegroundColorSpan span = new ForegroundColorSpan(context.getResources().getColor(colorID));
+            spannableString.setSpan(span, matcher.start() - start, matcher.end() + end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        return spannableString;
+    }
 
+    /**
+     * 判断手机是否开启位置服务
+     */
+    public static boolean isLocServiceEnable(Context context)
+    {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        if (gps || network)
+        {
+            return true;
+        }
+        return false;
+    }
 
 
 }
